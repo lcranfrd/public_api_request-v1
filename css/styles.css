@@ -207,6 +207,10 @@ header h1 {
     outline: none;
   }
   
+  .disabled {
+    opacity: 0.6;
+    cursor: not-allowed
+  }
 
 /* ===================================== 
    Media Queries

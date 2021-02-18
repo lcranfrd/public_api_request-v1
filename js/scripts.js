@@ -1,6 +1,6 @@
 "use strict";
 
-const randomEmployeeUrl = 'https://randomuser.me/api/?results=12&nat=us,gb,fr,au,de&seed=bucky';
+const employeesUrl = 'https://randomuser.me/api/?results=12&nat=us,gb,fr,au,de&seed=bucky';
 const searchDiv = document.querySelector('.search-container');
 const employeesDiv = document.querySelector('#gallery');
 const modalContainerDiv = document.createElement('div');
@@ -21,7 +21,7 @@ async function getUsers(url) {
   return data.results;
 }
 
-getUsers(randomEmployeeUrl)
+getUsers(employeesUrl)
   .then((data) => {
     data.sort((a,b) => {
       let aLow = a.name.last.toLowerCase(),
@@ -29,7 +29,6 @@ getUsers(randomEmployeeUrl)
       return (aLow < bLow) && -1 || (aLow > bLow) && 1 || 0;
     });
     data.forEach((v) => liveIds.push(v.login.uuid));
-    // console.log(`first ${liveIds.length}`)
     makeEmployees(data,liveIds);
     createModalBones(data);
   })
@@ -38,7 +37,6 @@ getUsers(randomEmployeeUrl)
 function makeEmployees(data, liveIds) {
   console.log(data);
   data.forEach((v) => {
-    // liveIds.push(v.login.uuid);
     const employeeHtml = `
       <div id="${v.login.uuid}" class="card">
       <div class="card-img-container">
@@ -88,37 +86,61 @@ function createModalBones(data) {
   document.querySelector('#modal-close-btn')
     .addEventListener('click', () => modalContainerDiv.style.display = 'none');
 
-  document.querySelector('#modal-next').addEventListener('click', () => {
+  document.querySelector('#modal-next').addEventListener('click', (e) => {
     const currentLiveId = document.querySelector('.modal-info-container').id;
-    getNextEmployee(data, liveIds, currentLiveId);
+    getEmployee(e, data, liveIds, currentLiveId);
   });
 
 
-  document.querySelector('#modal-prev').addEventListener('click', () => {
+  document.querySelector('#modal-prev').addEventListener('click', (e) => {
     const currentLiveId = document.querySelector('.modal-info-container').id;
-    getPrevEmployee(data, liveIds, currentLiveId);
+    console.log(currentLiveId)
+    getEmployee(e, data, liveIds, currentLiveId);
   });
 }
 
-function getNextEmployee(data, liveIds, currentLiveId) {
-  const currentLiveIndx = liveIds.indexOf(currentLiveId);
-  (currentLiveIndx <= data.length -1 && currentLiveIndx !== data.length -1) 
-    && modalHtml(data[currentLiveIndx + 1])
-}
-
-function getPrevEmployee(data, liveIds, currentLiveId) {
-  const currentLiveIndx = liveIds.indexOf(currentLiveId);
-  (currentLiveIndx <= data.length -1 && currentLiveIndx !== 0)
-    && modalHtml(data[currentLiveIndx - 1])
-  // const currentEmployeeIndx = data.indexOf(data.find((v) => v.login.uuid ===currentLiveId));
-
-}
-
-function makeModalIds(data, liveIds) {
-  if(liveIds.length !== 0) {
-    return data.filter((v) => uuids.includes(v.login.uuid));
+function getEmployee(e, data, liveIds, currentLiveId) {
+  const btn = e.target;
+  let currentLiveIndx = liveIds.indexOf(currentLiveId);
+  // console.log(`${liveIds} ${currentLiveId} ${currentLiveIndx}`)
+  if(btn.id === 'modal-prev') {
+    // currentLiveIndx--;
+    (currentLiveIndx === 0) && (btn.disabled = true);
+    document.querySelector('#modal-next').disabled = false;
+    (!btn.disabled) && modalHtml(data[currentLiveIndx-1]);
   }
+  if(btn.id === 'modal-next') {
+    // currentLiveIndx++;
+    (currentLiveIndx === data.length -1) && (btn.disabled = true);
+    document.querySelector('#modal-prev').disabled = false;
+    (!btn.disabled) && modalHtml(data[currentLiveIndx+1]);
+  }
+
+
 }
+
+function getNextEmployee(e, data, liveIds, currentLiveId) {
+  const nextBtn = document.querySelector('#modal-next');
+  const currentLiveIndx = liveIds.indexOf(currentLiveId);
+  nextBtn.disabled = (currentLiveIndx === data.length -1)? true: false;
+  currentLiveIndx <= data.length -1 && modalHtml(data[currentLiveIndx + 1])
+}
+
+function getPrevEmployee(e, data, liveIds, currentLiveId) {
+  console.log(e.target.id)
+  const prevBtn = document.querySelector('#modal-prev');
+  const currentLiveIndx = liveIds.indexOf(currentLiveId);
+  prevBtn.disabled = (currentLiveIndx -1 === 0)? true: false;
+  console.log(prevBtn);
+  console.log(`${liveIds} ${currentLiveIndx} ${currentLiveIndx === 0}`)
+  currentLiveIndx <= data.length -1 && modalHtml(data[currentLiveIndx - 1])
+}
+
+// function makeModalIds(data, liveIds) {
+//   if(liveIds.length !== 0) {
+//     return data.filter((v) => uuids.includes(v.login.uuid));
+//   }
+// }
 
 function makeModal(e, data, liveIds) {
   const currentUuid = e.target.closest('.card').id;
