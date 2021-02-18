@@ -93,21 +93,23 @@ function createModalBones(data) {
 }
 
 function getModalEmployee(e, data, currentLiveId) {
-  console.log(liveIds.length)
   const btn = e.target;
   let currentLiveIndx = liveIds.indexOf(currentLiveId);
   if(btn.id === 'modal-prev') {
     document.querySelector('#modal-next').disabled = false;
-    (!btn.disabled) && modalHtml(data[--currentLiveIndx]);
+    (!btn.disabled) && modalHtml(data[getDataId(data, liveIds[--currentLiveIndx])]);
     (currentLiveIndx === 0) && (btn.disabled = true);
   }
   if(btn.id === 'modal-next') {
     document.querySelector('#modal-prev').disabled = false;
-    (!btn.disabled) && modalHtml(data[++currentLiveIndx]);
-    (currentLiveIndx === data.length -1) && (btn.disabled = true);
+    (!btn.disabled) && modalHtml(data[getDataId(data, liveIds[++currentLiveIndx])]);
+    (currentLiveIndx === liveIds.length -1) && (btn.disabled = true);
   }
-  
-  
+}
+
+function getDataId(data, employeeLiveId) {
+  console.log(data.indexOf(data.find((v) => v.login.uuid.includes(employeeLiveId))));
+  return data.indexOf(data.find((v) => v.login.uuid.includes(employeeLiveId)));
 }
 
 function makeModal(e, data) {
