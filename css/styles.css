@@ -207,10 +207,9 @@ header h1 {
     outline: none;
   }
   
-  #modal-prev:disabled
-  #modal-next:disabled {
-    opacity: 0.6;
-    cursor: not-allowed
+  button:disabled {
+    opacity: 0.2;
+    cursor: not-allowed;
   }
 
 /* ===================================== 

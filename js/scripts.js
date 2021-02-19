@@ -1,6 +1,6 @@
 "use strict";
 
-const employeesUrl = 'https://randomuser.me/api/?results=12&nat=us,gb,fr,au,de&seed=bucky';
+const employeesUrl = 'https://randomuser.me/api/?results=12&nat=us&seed=bucky';
 const searchDiv = document.querySelector('.search-container');
 const employeesDiv = document.querySelector('#gallery');
 const modalContainerDiv = document.createElement('div');
@@ -8,11 +8,12 @@ let liveIds = [];
 let employeeHtml = '';
 
 async function getApi(url) {
+  employeesDiv.innerHTML = `<h2>Loading Employees</h2>`;
   try{
     const response = await fetch(url);
     return await response.json();
   } catch (error) {
-    throw error;
+    throw employeesDiv.innerHTML = `<h2>Something Unpleasant Happened: ${error}</h2>`;
   }
 }
 
@@ -22,7 +23,9 @@ async function getUsers(url) {
 }
 
 getUsers(employeesUrl)
-  .then((data) => {
+.then((data) => {
+  console.log(data);
+    employeesDiv.innerHTML = '';
     data.sort((a,b) => {
       let aLow = a.name.last.toLowerCase(),
       bLow = b.name.last.toLowerCase();
@@ -54,7 +57,7 @@ function makeEmployees(data) {
     });
 
   employeesDiv.addEventListener('click', (e) => {
-    (e.target.className !== 'gallery') && makeModal(e,data,liveIds);
+    (e.target.className !== 'gallery') && makeModal(e, data);
   });
 }
 
@@ -108,33 +111,49 @@ function getModalEmployee(e, data, currentLiveId) {
 }
 
 function getDataId(data, employeeLiveId) {
-  console.log(data.indexOf(data.find((v) => v.login.uuid.includes(employeeLiveId))));
   return data.indexOf(data.find((v) => v.login.uuid.includes(employeeLiveId)));
+}
+
+function getLiveIdsId(currentUuid) {
+  return liveIds.indexOf(liveIds.find((v) => v === currentUuid));
 }
 
 function makeModal(e, data) {
   const currentUuid = e.target.closest('.card').id;
-  // const currentLiveId = liveIds.indexOf(currentUuid);
+  const currentLiveIndx = getLiveIdsId(currentUuid);
   const employee = data.find((v) => currentUuid.includes(v.login.uuid));
   // 23 Portland Ave., Portland, OR 97204
-  modalHtml(employee);
+  modalHtml(employee, currentLiveIndx);
   
 }
+const makeDateStr = (date) => {
+  const reg = /^(\d{4})-(\d{2})-(\d{2})/.exec(date);
+  return `${reg[2]}/${reg[3]}/${reg[1]}`;
+}
 
-function modalHtml(employee) {
+const makePhoneStr = (cell) => cell.replace(/\)-/, ') ');
+
+function modalHtml(employee, currentLiveIndx) {
   const modalInfoContainerDiv = document.querySelector('.modal-info-container');
   modalInfoContainerDiv.id = employee.login.uuid;
   modalInfoContainerDiv.innerHTML = '';
   const modalHtml = `
-    <img class="modal-img" src="${employee.picture.large}" alt="profile picture">
-    <h3 id="name" class="modal-name cap">${employee.name.first} ${employee.name.last}</h3>
-    <p class="modal-text">${employee.email}</p>
-    <p class="modal-text cap">${employee.location.city}</p>
-    <hr>
-    <p class="modal-text">${employee.phone}</p>
-    <p class="modal-text">${employee.location.street.number} ${employee.location.street.name}, ${employee.location.city}, ${employee.location.state} ${employee.location.postcode}</p>
-    <p class="modal-text">${employee.dob.date}</p>
+  <img class="modal-img" src="${employee.picture.large}" alt="profile picture">
+  <h3 id="name" class="modal-name cap">${employee.name.first} ${employee.name.last}</h3>
+  <p class="modal-text">${employee.email}</p>
+  <p class="modal-text cap">${employee.location.city}</p>
+  <hr>
+  <p class="modal-text">${makePhoneStr(employee.cell)}</p>
+  <p class="modal-text">${employee.location.street.number} ${employee.location.street.name}, ${employee.location.city}, ${employee.location.state} ${employee.location.postcode}</p>
+  <p class="modal-text">Birthday: ${makeDateStr(employee.dob.date)}</p>
   `;
+  
+  document.querySelector('#modal-prev').disabled = (currentLiveIndx === 0)
+    ? true
+    : false;
+  document.querySelector('#modal-next').disabled = (currentLiveIndx === liveIds.length-1)
+    ? true
+    : false;
   modalInfoContainerDiv.insertAdjacentHTML('beforeend', modalHtml);
   modalContainerDiv.style.display = 'block';
 }
@@ -145,7 +164,6 @@ function clearEmployeesDivMakeLiveIds(data, filteredData) {
   (filteredData.length === 0)
     ? data.forEach((v) => liveIds.push(v.login.uuid))
     : filteredData.forEach((v) => liveIds.push(v.login.uuid));
-  console.log(liveIds)
   makeEmployees(data);
 }
 
