@@ -75,6 +75,7 @@ header h1 {
     width: 100%;
     max-width: 1200px;
     margin: auto;
+    z-index: 100;
 }
   
 .card {
@@ -120,30 +121,38 @@ header h1 {
 }
 
 
+
+
+
 /* ===================================== 
-   Modal
+Modal
 ======================================== */
 
 .modal-container {
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    background: rgba(0, 0, 0, 0.7);
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 0
+  /* transition: all 1.5s ease-in-out; */
 }
 
 .modal {
-    position: relative;
-    width: 95%;
-    max-width: 420px;
-    min-height: 415px;
-    margin: 10px auto auto;
-    padding-bottom: 15px;
-    background: rgba(255, 255, 255, 1);
-    border-radius: 0.25em;
-    border: 1px solid rgba(100, 100, 100, 0.3);
-    transition: .4s ease-out;
+  position: relative;
+  width: 95%;
+  max-width: 420px;
+  min-height: 415px;
+  margin: 10px auto auto;
+  padding-bottom: 15px;
+  background: rgba(255, 255, 255, 1);
+  border-radius: 0.25em;
+  border: 1px solid rgba(100, 100, 100, 0.3);
+  z-index: 0;
+  /* animation: animate__slideInLeft;
+  animation-duration: 1s; */
+    /* transition: 2s ease-out; */
 }
 
 .modal-close-btn {

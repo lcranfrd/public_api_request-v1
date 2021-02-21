@@ -1,6 +1,6 @@
 "use strict";
 
-const employeesUrl = 'https://randomuser.me/api/?results=12&nat=us&seed=bucky';
+const employeesUrl = 'https://randomuser.me/api/?results=12&nat=us';
 const searchDiv = document.querySelector('.search-container');
 const employeesDiv = document.querySelector('#gallery');
 const modalContainerDiv = document.createElement('div');
@@ -24,15 +24,15 @@ async function getUsers(url) {
 
 getUsers(employeesUrl)
 .then((data) => {
-  console.log(data);
     employeesDiv.innerHTML = '';
     data.sort((a,b) => {
       let aLow = a.name.last.toLowerCase(),
       bLow = b.name.last.toLowerCase();
       return (aLow < bLow) && -1 || (aLow > bLow) && 1 || 0;
     });
+
     data.forEach((v) => liveIds.push(v.login.uuid));
-    makeEmployees(data,liveIds);
+    makeEmployees(data);
     createModalBones(data);
     addSearch(data, liveIds);
   })
@@ -42,7 +42,7 @@ function makeEmployees(data) {
   data.filter((v1) => liveIds.includes(v1.login.uuid))
     .forEach((v) => {
       const employeeHtml = `
-        <div id="${v.login.uuid}" class="card">
+        <div id="${v.login.uuid}" class="animate__animated animate__zoomInRight card">
         <div class="card-img-container">
             <img class="card-img" src="${v.picture.large}" alt="profile picture">
         </div>
@@ -65,13 +65,13 @@ function makeEmployees(data) {
 function createModalBones(data) {
   modalContainerDiv.className = 'modal-container';
   const modalHtml = `
-  <div class="modal">
+  <div class="modal animate__animated animate__fadeInLeft">
     <button type="button" id="modal-close-btn" class="modal-close-btn"><strong>X</strong></button>
     <div class="modal-info-container">
 
     </div>
   </div>
-    <div class="modal-btn-container">
+    <div class="modal-btn-container  animate__animated animate__fadeInRight">
       <button type="button" id="modal-prev" class="modal-prev btn">Prev</button>
       <button type="button" id="modal-next" class="modal-next btn">Next</button>
     </div>
@@ -79,10 +79,42 @@ function createModalBones(data) {
   `;
   modalContainerDiv.innerHTML = modalHtml;
   modalContainerDiv.style.display  = 'none';
-  document.body.insertAdjacentElement('beforeend', modalContainerDiv);
+  employeesDiv.insertAdjacentElement('afterend', modalContainerDiv);
   
-  document.querySelector('#modal-close-btn')
-  .addEventListener('click', () => modalContainerDiv.style.display = 'none');
+  async function slideOut() {
+    const modalDiv = document.querySelector('.animate__fadeInLeft');
+    // const modalInfoContainerDiv = document.querySelector('.modal-info-container');
+    const modalBtnContainerDiv = document.querySelector('.animate__fadeInRight');
+    modalDiv.classList.remove('animate__fadeInLeft');
+    modalBtnContainerDiv.classList.remove('animate__fadeInRight');
+    modalDiv.classList.add('animate__fadeOutLeft');
+    modalBtnContainerDiv.classList.add('animate__fadeOutRight');
+
+    let fadeOut = new Promise ((resolve) => {
+      modalDiv.addEventListener('animationend', changeAniDir);
+      return resolve(true);
+    });
+    await fadeOut
+      .then((result) => {
+        modalContainerDiv.style.display = 'none';
+        result.removeEventListener('animationend',changeAniDir);
+      });
+    // modalDiv.addEventListener('animationend', changeAniDir);
+
+    function changeAniDir() {
+      modalDiv.classList.remove('animate__fadeOutLeft');
+      modalBtnContainerDiv.classList.remove('animate__fadeOutRight');
+      modalDiv.classList.add('animate__fadeInLeft');
+      modalBtnContainerDiv.classList.add('animate__fadeInRight');
+      // modalContainerDiv.style.display = 'none';
+      return true;
+      // let wait = new Promise ((resolve,reject) => setTimeout(() => resolve(true), 25));
+      // await wait
+      //   .then(modalDiv.removeEventListener('animationend',changeAniDir));
+    }
+  }
+
+  document.querySelector('#modal-close-btn').addEventListener('click', slideOut);
   
   document.querySelector('#modal-next').addEventListener('click', (e) => {
     const currentLiveId = document.querySelector('.modal-info-container').id;
@@ -122,9 +154,7 @@ function makeModal(e, data) {
   const currentUuid = e.target.closest('.card').id;
   const currentLiveIndx = getLiveIdsId(currentUuid);
   const employee = data.find((v) => currentUuid.includes(v.login.uuid));
-  // 23 Portland Ave., Portland, OR 97204
   modalHtml(employee, currentLiveIndx);
-  
 }
 const makeDateStr = (date) => {
   const reg = /^(\d{4})-(\d{2})-(\d{2})/.exec(date);
@@ -135,17 +165,17 @@ const makePhoneStr = (cell) => cell.replace(/\)-/, ') ');
 
 function modalHtml(employee, currentLiveIndx) {
   const modalInfoContainerDiv = document.querySelector('.modal-info-container');
-  modalInfoContainerDiv.id = employee.login.uuid;
-  modalInfoContainerDiv.innerHTML = '';
+    modalInfoContainerDiv.id = employee.login.uuid;
+    modalInfoContainerDiv.innerHTML = '';
   const modalHtml = `
-  <img class="modal-img" src="${employee.picture.large}" alt="profile picture">
-  <h3 id="name" class="modal-name cap">${employee.name.first} ${employee.name.last}</h3>
-  <p class="modal-text">${employee.email}</p>
-  <p class="modal-text cap">${employee.location.city}</p>
-  <hr>
-  <p class="modal-text">${makePhoneStr(employee.cell)}</p>
-  <p class="modal-text">${employee.location.street.number} ${employee.location.street.name}, ${employee.location.city}, ${employee.location.state} ${employee.location.postcode}</p>
-  <p class="modal-text">Birthday: ${makeDateStr(employee.dob.date)}</p>
+    <img class="modal-img" src="${employee.picture.large}" alt="profile picture">
+    <h3 id="name" class="modal-name cap">${employee.name.first} ${employee.name.last}</h3>
+    <p class="modal-text">${employee.email}</p>
+    <p class="modal-text cap">${employee.location.city}</p>
+    <hr>
+    <p class="modal-text">${makePhoneStr(employee.cell)}</p>
+    <p class="modal-text">${employee.location.street.number} ${employee.location.street.name}, ${employee.location.city}, ${employee.location.state} ${employee.location.postcode}</p>
+    <p class="modal-text">Birthday: ${makeDateStr(employee.dob.date)}</p>
   `;
   
   document.querySelector('#modal-prev').disabled = (currentLiveIndx === 0)
