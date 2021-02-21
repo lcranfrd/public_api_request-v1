@@ -83,36 +83,28 @@ function createModalBones(data) {
   
   async function slideOut() {
     const modalDiv = document.querySelector('.animate__fadeInLeft');
-    // const modalInfoContainerDiv = document.querySelector('.modal-info-container');
     const modalBtnContainerDiv = document.querySelector('.animate__fadeInRight');
-    modalDiv.classList.remove('animate__fadeInLeft');
-    modalBtnContainerDiv.classList.remove('animate__fadeInRight');
-    modalDiv.classList.add('animate__fadeOutLeft');
-    modalBtnContainerDiv.classList.add('animate__fadeOutRight');
-
-    let fadeOut = new Promise ((resolve) => {
-      modalDiv.addEventListener('animationend', changeAniDir);
-      return resolve(true);
+    let fadeOut = new Promise ((resolve,reject) => {
+      doFade();
+      setTimeout(() => resolve(true),500);
     });
-    await fadeOut
-      .then((result) => {
-        modalContainerDiv.style.display = 'none';
-        result.removeEventListener('animationend',changeAniDir);
-      });
-    // modalDiv.addEventListener('animationend', changeAniDir);
 
-    function changeAniDir() {
+  await fadeOut
+    .then(() => {
+      modalContainerDiv.style.display = 'none';
       modalDiv.classList.remove('animate__fadeOutLeft');
       modalBtnContainerDiv.classList.remove('animate__fadeOutRight');
       modalDiv.classList.add('animate__fadeInLeft');
       modalBtnContainerDiv.classList.add('animate__fadeInRight');
-      // modalContainerDiv.style.display = 'none';
-      return true;
-      // let wait = new Promise ((resolve,reject) => setTimeout(() => resolve(true), 25));
-      // await wait
-      //   .then(modalDiv.removeEventListener('animationend',changeAniDir));
-    }
+    })
+
+  function doFade() {
+    modalDiv.classList.remove('animate__fadeInLeft');
+    modalBtnContainerDiv.classList.remove('animate__fadeInRight');
+    modalDiv.classList.add('animate__fadeOutLeft');
+    modalBtnContainerDiv.classList.add('animate__fadeOutRight');
   }
+ }
 
   document.querySelector('#modal-close-btn').addEventListener('click', slideOut);
   
