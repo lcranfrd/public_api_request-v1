@@ -167,8 +167,7 @@ function modalHtml(employee, currentLiveIndx) {
     <hr>
     <p class="modal-text">${makePhoneStr(employee.cell)}</p>
     <p class="modal-text">${employee.location.street.number} ${employee.location.street.name}, ${employee.location.city}, ${employee.location.state} ${employee.location.postcode}</p>
-    <p class="modal-text">Birthday: ${makeDateStr(employee.dob.date)}</p>
-  `;
+    <p class="modal-text">Birthday: ${makeDateStr(employee.dob.date)}</p>`;
   
   document.querySelector('#modal-prev').disabled = (currentLiveIndx === 0)
     ? true
