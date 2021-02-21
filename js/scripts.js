@@ -42,7 +42,7 @@ function makeEmployees(data) {
   data.filter((v1) => liveIds.includes(v1.login.uuid))
     .forEach((v) => {
       const employeeHtml = `
-        <div id="${v.login.uuid}" class="animate__animated animate__zoomInRight card">
+        <div id="${v.login.uuid}" class="animate__animated animate__fadeInDownBig card">
         <div class="card-img-container">
             <img class="card-img" src="${v.picture.large}" alt="profile picture">
         </div>
@@ -84,14 +84,15 @@ function createModalBones(data) {
   async function slideOut() {
     const modalDiv = document.querySelector('.animate__fadeInLeft');
     const modalBtnContainerDiv = document.querySelector('.animate__fadeInRight');
-    let fadeOut = new Promise ((resolve,reject) => {
+    let fadeOut = new Promise ((resolve) => {
       doFade();
-      setTimeout(() => resolve(true),500);
+      setTimeout(() => resolve(true),1500);
     });
 
   await fadeOut
     .then(() => {
       modalContainerDiv.style.display = 'none';
+      modalContainerDiv.classList.remove('modal-out');
       modalDiv.classList.remove('animate__fadeOutLeft');
       modalBtnContainerDiv.classList.remove('animate__fadeOutRight');
       modalDiv.classList.add('animate__fadeInLeft');
@@ -99,6 +100,7 @@ function createModalBones(data) {
     })
 
   function doFade() {
+    modalContainerDiv.classList.add('modal-out');
     modalDiv.classList.remove('animate__fadeInLeft');
     modalBtnContainerDiv.classList.remove('animate__fadeInRight');
     modalDiv.classList.add('animate__fadeOutLeft');
