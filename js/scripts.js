@@ -216,7 +216,6 @@ function addSearch(data) {
           employeesDiv.insertAdjacentHTML('beforeend', `
           <h1 class="no-results">No Search Results Found</h1>`);
         }
-    // search.length === 0 && clearEmployeesDivMakeLiveIds(data, liveIds, filteredData);
   } 
 
   document.querySelector('#search-input').addEventListener('keyup', (e) => {
