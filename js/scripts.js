@@ -1,10 +1,4 @@
 "use strict";
-const getTwoState = () => {
-  return import ('./states.js')
-    .then((response) => response.twoLetterStates);
-}
-const states = getTwoState()
-console.log(states)
 
 const employeesUrl = 'https://randomuser.me/api/?results=12&nat=us';
 const searchDiv = document.querySelector('.search-container');
@@ -12,6 +6,28 @@ const galleryDiv = document.querySelector('#gallery');
 const modalContainerDiv = document.createElement('div');
 let liveIds = [];
 let employeeHtml = '';
+
+/**------------------------------------------------------------------------
+ * *                          Program Entry
+ *   Fetch data, sort data, create LiveIds, call functions to print
+ *   employees to screen, create the html outline for the modal element,
+ *   add the search bar to screen
+ *------------------------------------------------------------------------**/
+getApi(employeesUrl)
+.then((data) => {
+    galleryDiv.innerHTML = '';
+    data.sort((a,b) => {
+      let aLow = a.name.last.toLowerCase(),
+      bLow = b.name.last.toLowerCase();
+      return (aLow < bLow) && -1 || (aLow > bLow) && 1 || 0;
+    });
+// console.log(data)
+    data.forEach((v) => liveIds.push(v.login.uuid));
+    makeEmployees(data);
+    createModalBones(data);
+    addSearch(data, liveIds);
+  })
+  .catch((e) => console.error(`Error of ${e}`));
 
 /**========================================================================
  **                           FUNCTION getApi
@@ -29,28 +45,6 @@ async function getApi(url) {
     throw galleryDiv.innerHTML = `<h2>Something Unpleasant Happened: ${error}</h2>`;
   }
 }
-//Alaska Connecticut District of Columbia  Georgia  Hawaii
-/**------------------------------------------------------------------------
- * *                          Program Entry
- *   Fetch data, sort data, create LiveIds, call functions to print
- *   employees to screen, create the html outline for the modal element,
- *   add the search bar to screen
- *------------------------------------------------------------------------**/
-getApi(employeesUrl)
-.then((data) => {
-    galleryDiv.innerHTML = '';
-    data.sort((a,b) => {
-      let aLow = a.name.last.toLowerCase(),
-      bLow = b.name.last.toLowerCase();
-      return (aLow < bLow) && -1 || (aLow > bLow) && 1 || 0;
-    });
-console.log(data)
-    data.forEach((v) => liveIds.push(v.login.uuid));
-    makeEmployees(data);
-    createModalBones(data);
-    addSearch(data, liveIds);
-  })
-  .catch((e) => console.error(`Error of ${e}`));
 
 /**========================================================================
  **                           FUNCTION makeEmployees
@@ -268,7 +262,7 @@ function modalHtml(employee, currentLiveIndx) {
     <p class="modal-text cap">${employee.location.city}</p>
     <hr>
     <p class="modal-text">${makePhoneStr(employee.cell)}</p>
-    <p class="modal-text">${employee.location.street.number} ${employee.location.street.name}, ${employee.location.city}, ${getTwoState(employee.location.state)} ${employee.location.postcode}</p>
+    <p class="modal-text">${employee.location.street.number} ${employee.location.street.name}, ${employee.location.city}, ${twoLetterStates[employee.location.state]} ${employee.location.postcode}</p>
     <p class="modal-text">Birthday: ${makeDateStr(employee.dob.date)}</p>`;
   
   document.querySelector('#modal-prev').disabled = (currentLiveIndx === 0)
@@ -348,3 +342,56 @@ function addSearch(data) {
     execSearch(e, data)
   });
 }
+
+/* twoLetterStates obj used to convert full state to 2 letter abbreviation */
+const twoLetterStates = {
+  'Arizona': 'AZ',
+  'Alabama': 'AL',
+  'Alaska':'AK',
+  'Arkansas': 'AR',
+  'California': 'CA',
+  'Colorado': 'CO',
+  'Connecticut': 'CT',
+  'Delaware': 'DE',
+  'Florida': 'FL',
+  'Georgia': 'GA',
+  'Hawaii': 'HI',
+  'Idaho': 'ID',
+  'Illinois': 'IL',
+  'Indiana': 'IN',
+  'Iowa': 'IA',
+  'Kansas': 'KS',
+  'Kentucky': 'KY',
+  'Louisiana': 'LA',
+  'Maine': 'ME',
+  'Maryland': 'MD',
+  'Massachusetts': 'MA',
+  'Michigan': 'MI',
+  'Minnesota': 'MN',
+  'Mississippi': 'MS',
+  'Missouri': 'MO',
+  'Montana': 'MT',
+  'Nebraska': 'NE',
+  'Nevada': 'NV',
+  'New Hampshire': 'NH',
+  'New Jersey': 'NJ',
+  'New Mexico': 'NM',
+  'New York': 'NY',
+  'North Carolina': 'NC',
+  'North Dakota': 'ND',
+  'Ohio': 'OH',
+  'Oklahoma': 'OK',
+  'Oregon': 'OR',
+  'Pennsylvania': 'PA',
+  'Rhode Island': 'RI',
+  'South Carolina': 'SC',
+  'South Dakota': 'SD',
+  'Tennessee': 'TN',
+  'Texas': 'TX',
+  'Utah': 'UT',
+  'Vermont': 'VT',
+  'Virginia': 'VA',
+  'Washington': 'WA',
+  'West Virginia': 'WV',
+  'Wisconsin': 'WI',
+  'Wyoming': 'WY'}
