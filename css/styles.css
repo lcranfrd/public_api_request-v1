@@ -138,9 +138,6 @@ Modal
   z-index: 0;
   transition: all 1.5s ease-in-out;
 }
-.modal-out {
-  opacity: 0;
-}
 
 .modal {
   position: relative;
@@ -153,8 +150,25 @@ Modal
   border-radius: 0.25em;
   border: 1px solid rgba(100, 100, 100, 0.3);
   z-index: 0;
-    /* transition: 2s ease-out; */
+  /* transition: 2s ease-out; */
 }
+
+/* */
+.modal.modal-non-filtered,
+.modal-btn-container.modal-non-filtered {
+  background: #ecf5ffe5; 
+}
+
+.modal.modal-non-filtered.modal-filtered,
+.modal-btn-container.modal-non-filtered.modal-filtered {
+  background: #eefef5e6;
+}
+
+.modal-out {
+  opacity: 0;
+}
+
+/* */
 
 .modal-close-btn {
     position: absolute;

@@ -2,29 +2,37 @@
 
 const employeesUrl = 'https://randomuser.me/api/?results=12&nat=us';
 const searchDiv = document.querySelector('.search-container');
-const employeesDiv = document.querySelector('#gallery');
+const galleryDiv = document.querySelector('#gallery');
 const modalContainerDiv = document.createElement('div');
 let liveIds = [];
 let employeeHtml = '';
 
+/**========================================================================
+ **                           FUNCTION getApi
+ *?  Try/Catch function for loading fetch operation
+ *@param url string for url   
+ *@return jason object
+ *========================================================================**/
 async function getApi(url) {
-  employeesDiv.innerHTML = `<h2>Loading Employees</h2>`;
-  try{
+  galleryDiv.innerHTML = `<h2>Loading Employees</h2>`;
+  try {
     const response = await fetch(url);
-    return await response.json();
+    const data = await response.json();
+    return data.results;
   } catch (error) {
-    throw employeesDiv.innerHTML = `<h2>Something Unpleasant Happened: ${error}</h2>`;
+    throw galleryDiv.innerHTML = `<h2>Something Unpleasant Happened: ${error}</h2>`;
   }
 }
 
-async function getUsers(url) {
-  const data = await getApi(url);
-  return data.results;
-}
-
-getUsers(employeesUrl)
+/**------------------------------------------------------------------------
+ * *                          Program Entry
+ *   Fetch data, sort data, create LiveIds, call functions to print
+ *   employees to screen, create the html outline for the modal element,
+ *   add the search bar to screen
+ *------------------------------------------------------------------------**/
+getApi(employeesUrl)
 .then((data) => {
-    employeesDiv.innerHTML = '';
+    galleryDiv.innerHTML = '';
     data.sort((a,b) => {
       let aLow = a.name.last.toLowerCase(),
       bLow = b.name.last.toLowerCase();
@@ -38,6 +46,13 @@ getUsers(employeesUrl)
   })
   .catch((e) => console.error(`Error of ${e}`));
 
+/**========================================================================
+ **                           FUNCTION makeEmployees
+ *?  Cycle through data and output Employees data to screen, create click
+ *?  EventListener to open modal. 
+ *@param data Object   
+ *@return null
+ *========================================================================**/
 function makeEmployees(data) {
   data.filter((v1) => liveIds.includes(v1.login.uuid))
     .forEach((v) => {
@@ -53,25 +68,32 @@ function makeEmployees(data) {
         </div>
       </div>
       `;
-      employeesDiv.insertAdjacentHTML('beforeend', employeeHtml);
+      galleryDiv.insertAdjacentHTML('beforeend', employeeHtml);
     });
 
-  employeesDiv.addEventListener('click', (e) => {
+  galleryDiv.addEventListener('click', (e) => {
     (e.target.className !== 'gallery') && makeModal(e, data);
   });
 }
 
-
+/**========================================================================
+ **                           FUNCTION createModalBones
+ *?  Create the outer HTML for the modal. Sets animation and background
+ *?  classes. Creates 3 eventListeners for buttons in modal. Contains
+ *?  3 helper functions for modal close animation.
+ *@param data Object  
+ *@return type
+ *========================================================================**/
 function createModalBones(data) {
   modalContainerDiv.className = 'modal-container';
   const modalHtml = `
-  <div class="modal animate__animated animate__fadeInLeft">
+  <div class="modal modal-non-filtered animate__animated animate__fadeInLeft">
     <button type="button" id="modal-close-btn" class="modal-close-btn"><strong>X</strong></button>
     <div class="modal-info-container">
 
     </div>
   </div>
-    <div class="modal-btn-container  animate__animated animate__fadeInRight">
+    <div class="modal-btn-container  modal-non-filtered animate__animated animate__fadeInRight">
       <button type="button" id="modal-prev" class="modal-prev btn">Prev</button>
       <button type="button" id="modal-next" class="modal-next btn">Next</button>
     </div>
@@ -79,8 +101,14 @@ function createModalBones(data) {
   `;
   modalContainerDiv.innerHTML = modalHtml;
   modalContainerDiv.style.display  = 'none';
-  employeesDiv.insertAdjacentElement('afterend', modalContainerDiv);
+  galleryDiv.insertAdjacentElement('afterend', modalContainerDiv);
   
+  /**========================================================================
+   **                           FUNCTION slideOut
+   *?  Function called by modal-close-btn eventListener. 'modalBtnContainerDiv'
+   *?  and 'modalDiv' are animated opposite left/right of each other.
+   *@return null
+   *========================================================================**/
   async function slideOut() {
     const modalDiv = document.querySelector('.animate__fadeInLeft');
     const modalBtnContainerDiv = document.querySelector('.animate__fadeInRight');
@@ -89,6 +117,12 @@ function createModalBones(data) {
       setTimeout(() => resolve(true),1500);
     });
 
+/**========================================================================
+ **                           FUNCTION fadeOut
+ *?  Reset classes after animation for opening animation.
+ *?  End result of animation is display:none.
+ *@return null
+ *========================================================================**/
   await fadeOut
     .then(() => {
       modalContainerDiv.style.display = 'none';
@@ -99,6 +133,11 @@ function createModalBones(data) {
       modalBtnContainerDiv.classList.add('animate__fadeInRight');
     })
 
+/**========================================================================
+ **                           FUNCTION doFade
+ *?  Initiate animation by changing classNames to the animation names.
+ *@return null
+ *========================================================================**/
   function doFade() {
     modalContainerDiv.classList.add('modal-out');
     modalDiv.classList.remove('animate__fadeInLeft');
@@ -108,6 +147,7 @@ function createModalBones(data) {
   }
  }
 
+/*  EventListeners for close, previous and next buttons in Modal  */
   document.querySelector('#modal-close-btn').addEventListener('click', slideOut);
   
   document.querySelector('#modal-next').addEventListener('click', (e) => {
@@ -121,6 +161,16 @@ function createModalBones(data) {
   });
 }
 
+/**========================================================================
+ **                       FUNCTION getModalEmployee
+ *?  Get single Employee object matching currentLiveId which is derived
+ *?  clicked element. Modal advance buttons are disabled/enabled according
+ *?  to the Employee displayed in the liveIds queue.
+ *@param e event Object  
+ *@param data JSON Object
+ *@param currentLiveId string  
+ *@return null
+ *========================================================================**/
 function getModalEmployee(e, data, currentLiveId) {
   const btn = e.target;
   let currentLiveIndx = liveIds.indexOf(currentLiveId);
@@ -136,27 +186,71 @@ function getModalEmployee(e, data, currentLiveId) {
   }
 }
 
+/**========================================================================
+ **                           FUNCTION getDataId
+ *?  Matches employeeLiveId with employee Id contained in the data objects
+ *?  and returns the index.
+ *@param data JASON Object  
+ *@param employeeLiveId string  
+ *@return integer
+ *========================================================================**/
 function getDataId(data, employeeLiveId) {
   return data.indexOf(data.find((v) => v.login.uuid.includes(employeeLiveId)));
 }
 
+/**========================================================================
+ **                           FUNCTION getLiveIdsId
+ *?  Matches currentUuid with liveIds array and returns the index.
+ *@param currentUuid string  
+ *@return integer
+ *========================================================================**/
 function getLiveIdsId(currentUuid) {
   return liveIds.indexOf(liveIds.find((v) => v === currentUuid));
 }
 
+/**========================================================================
+ **                           FUNCTION makeModal
+ *?  Starts the business of making the Modal. Gets employee id from clicked
+ *?  element, sets the pointers to the data object. Sets classes for 
+ *?  background change if is created from a subset via search results.
+ *@param e event object  
+ *@param data JSON object  
+ *@return null
+ *========================================================================**/
 function makeModal(e, data) {
   const currentUuid = e.target.closest('.card').id;
   const currentLiveIndx = getLiveIdsId(currentUuid);
   const employee = data.find((v) => currentUuid.includes(v.login.uuid));
+  const modalDiv = document.querySelector('.modal');
+  const modalBtnContainerDiv = document.querySelector('.modal-btn-container');
+  if(liveIds.length === data.length) {
+    modalDiv.classList.remove('modal-filtered');
+    modalBtnContainerDiv.classList.remove('modal-filtered');
+  } else {
+    modalDiv.classList.add('modal-filtered');
+    modalBtnContainerDiv.classList.add('modal-filtered');
+  }
   modalHtml(employee, currentLiveIndx);
 }
+
+/*  2 Helper functions to extract, format and return date and cellphone */
 const makeDateStr = (date) => {
   const reg = /^(\d{4})-(\d{2})-(\d{2})/.exec(date);
   return `${reg[2]}/${reg[3]}/${reg[1]}`;
+
 }
-
 const makePhoneStr = (cell) => cell.replace(/\)-/, ') ');
+/* *** */
 
+/**========================================================================
+ **                           FUNCTION modalHtml
+ *?  Continue with the business of making Modal. Output the Employee info and
+ *?  disable/enable prev and next button in accordance to begin and end of
+ *?  Employees in liveIds
+ *@param employee JASON object 
+ *@param currentLiveIndx integer
+ *@return null
+ *========================================================================**/
 function modalHtml(employee, currentLiveIndx) {
   const modalInfoContainerDiv = document.querySelector('.modal-info-container');
     modalInfoContainerDiv.id = employee.login.uuid;
@@ -181,8 +275,16 @@ function modalHtml(employee, currentLiveIndx) {
   modalContainerDiv.style.display = 'block';
 }
 
-function clearEmployeesDivMakeLiveIds(data, filteredData) {
-  employeesDiv.innerHTML = '';
+/**========================================================================
+ **                 FUNCTION clearGalleryDivMakeLiveIds
+ *?  Helper function that resets the gallery and liveIds with data taken
+ *?  from filteredData then calls makeEmployees().
+ *@param data JASON object  
+ *@param filteredData JASON object
+ *@return null
+ *========================================================================**/
+function clearGalleryDivMakeLiveIds(data, filteredData) {
+  galleryDiv.innerHTML = '';
   liveIds = [];
   (filteredData.length === 0)
     ? data.forEach((v) => liveIds.push(v.login.uuid))
@@ -190,6 +292,12 @@ function clearEmployeesDivMakeLiveIds(data, filteredData) {
   makeEmployees(data);
 }
 
+/**========================================================================
+ **                           FUNCTION addSearch
+ *?  Adds the html for the search bar and all of its functionality.
+ *@param data JASON object  
+ *@return null
+ *========================================================================**/
 function addSearch(data) {
   const searchHtml = `
   <form action="#" method="get">
@@ -199,27 +307,35 @@ function addSearch(data) {
   `;
   searchDiv.insertAdjacentHTML('beforeend', searchHtml);
 
+  /**========================================================================
+   **                           FUNCTION execSearch
+   *?  Executes the search called by eventListener. Data found is passed via
+   *?  calling clearGalleryDivMakeLiveIds().
+   *@param e Event object  
+   *@param data JASON object  
+   *@return null
+   *========================================================================**/
   function execSearch(e, data) {
     e.preventDefault();
-    const search = document.querySelector('#search-input').value;
+    const searchStr = document.querySelector('#search-input').value;
     let filteredData = [];
-    if(search.length > 0) {
+    if(searchStr.length > 0) {
       filteredData = data.filter((v) => 
-        `${v.name.first} ${v.name.last}`.toLowerCase().includes(search.toLowerCase())
+        `${v.name.first} ${v.name.last}`.toLowerCase().includes(searchStr.toLowerCase())
       );
     }
     if(filteredData.length > 0) {
-      clearEmployeesDivMakeLiveIds(data, filteredData);
-    } else if(search.length === 0) {
-        clearEmployeesDivMakeLiveIds(data, filteredData);
+      clearGalleryDivMakeLiveIds(data, filteredData);
+    } else if(searchStr.length === 0) {
+        clearGalleryDivMakeLiveIds(data, filteredData);
       } else{
-          employeesDiv.innerHTML = '';
-          employeesDiv.insertAdjacentHTML('beforeend', `
+          galleryDiv.innerHTML = '';
+          galleryDiv.insertAdjacentHTML('beforeend', `
           <h1 class="no-results">No Search Results Found</h1>`);
         }
   } 
 
-  document.querySelector('#search-input').addEventListener('keyup', (e) => {
+  document.querySelector('#search-input').addEventListener('input', (e) => {
     execSearch(e, data)
   });
   document.querySelector('form').addEventListener('submit', (e) => {
