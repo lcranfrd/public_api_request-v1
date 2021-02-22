@@ -1,7 +1,7 @@
 /* ===================================== 
    Public API Request
 ======================================== */
-
+@import url('https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css');
 @import url('https://fonts.googleapis.com/css?family=Nunito');
 
 * {
@@ -88,7 +88,8 @@ header h1 {
     max-width: 360px;
     margin: 10px 10px 20px;
     padding: 10px;
-    background: rgba(245, 245, 245, 0.9);
+    background: #e4fafbe5;
+    /* background: rgba(245, 245, 245, 0.9); */
     border-radius: 0.25em;
     border: 1px solid rgba(50, 50, 50, 0.3);
     transition: .4s ease-out;

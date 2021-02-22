@@ -1,4 +1,10 @@
 "use strict";
+const getTwoState = () => {
+  return import ('./states.js')
+    .then((response) => response.twoLetterStates);
+}
+const states = getTwoState()
+console.log(states)
 
 const employeesUrl = 'https://randomuser.me/api/?results=12&nat=us';
 const searchDiv = document.querySelector('.search-container');
@@ -23,7 +29,7 @@ async function getApi(url) {
     throw galleryDiv.innerHTML = `<h2>Something Unpleasant Happened: ${error}</h2>`;
   }
 }
-
+//Alaska Connecticut District of Columbia  Georgia  Hawaii
 /**------------------------------------------------------------------------
  * *                          Program Entry
  *   Fetch data, sort data, create LiveIds, call functions to print
@@ -38,7 +44,7 @@ getApi(employeesUrl)
       bLow = b.name.last.toLowerCase();
       return (aLow < bLow) && -1 || (aLow > bLow) && 1 || 0;
     });
-
+console.log(data)
     data.forEach((v) => liveIds.push(v.login.uuid));
     makeEmployees(data);
     createModalBones(data);
@@ -64,7 +70,7 @@ function makeEmployees(data) {
         <div class="card-info-container">
             <h3 id="name" class="card-name cap">${v.name.first} ${v.name.last}</h3>
             <p class="card-text">${v.email}</p>
-            <p class="card-text cap">${v.location.city}, ${v.location.state}</p>
+            <p class="card-text cap">${v.location.city}</p>
         </div>
       </div>
       `;
@@ -262,7 +268,7 @@ function modalHtml(employee, currentLiveIndx) {
     <p class="modal-text cap">${employee.location.city}</p>
     <hr>
     <p class="modal-text">${makePhoneStr(employee.cell)}</p>
-    <p class="modal-text">${employee.location.street.number} ${employee.location.street.name}, ${employee.location.city}, ${employee.location.state} ${employee.location.postcode}</p>
+    <p class="modal-text">${employee.location.street.number} ${employee.location.street.name}, ${employee.location.city}, ${getTwoState(employee.location.state)} ${employee.location.postcode}</p>
     <p class="modal-text">Birthday: ${makeDateStr(employee.dob.date)}</p>`;
   
   document.querySelector('#modal-prev').disabled = (currentLiveIndx === 0)
