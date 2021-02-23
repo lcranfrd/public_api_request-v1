@@ -1,4 +1,5 @@
 "use strict";
+/*No matter what I try, I can only get a returned Promise object */
 const states = async (state) => {
   return await import("./states.js")
   .finally((module) => module)
@@ -15,7 +16,7 @@ console.log(states('Idaho'))
 //   return await abbr;
 // };
 
-
+/************************************************ */
 // let ab = getStateAbbr('Idaho').then((response)=>response.Idaho);
 // console.log(ab)
 const employeesUrl = 'https://randomuser.me/api/?results=12&nat=us';
