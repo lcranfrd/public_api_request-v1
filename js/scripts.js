@@ -1,16 +1,4 @@
 "use strict";
-/*No matter what I try, I can only get a returned Promise object */
-const states = async (state) => {
-  return await import("./states.js")
-  .finally((module) => module)
-  .then((obj) => obj.twoLetterStates)
-  .then((states) => states[state])
-
-}
-console.log(states('Idaho'))
-
-
-/************************************************ */
 
 const employeesUrl = 'https://randomuser.me/api/?results=12&nat=us';
 const searchDiv = document.querySelector('.search-container');
@@ -33,7 +21,6 @@ getApi(employeesUrl)
       bLow = b.name.last.toLowerCase();
       return (aLow < bLow) && -1 || (aLow > bLow) && 1 || 0;
     });
-// console.log(data)
     data.forEach((v) => liveIds.push(v.login.uuid));
     makeEmployees(data);
     createModalBones(data);
