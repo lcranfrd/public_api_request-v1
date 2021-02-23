@@ -11,8 +11,7 @@ console.log(states('Idaho'))
 
 
 /************************************************ */
-// let ab = getStateAbbr('Idaho').then((response)=>response.Idaho);
-// console.log(ab)
+
 const employeesUrl = 'https://randomuser.me/api/?results=12&nat=us';
 const searchDiv = document.querySelector('.search-container');
 const galleryDiv = document.querySelector('#gallery');
