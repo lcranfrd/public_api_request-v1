@@ -5,16 +5,10 @@ const states = async (state) => {
   .finally((module) => module)
   .then((obj) => obj.twoLetterStates)
   .then((states) => states[state])
-    // .then((states) => {
-      //   return states.twoLetterStates.Indiana;
-      // });
+
 }
 console.log(states('Idaho'))
 
-// async function getStateAbbr(state) {
-//   const abbr = await states();
-//   return await abbr;
-// };
 
 /************************************************ */
 // let ab = getStateAbbr('Idaho').then((response)=>response.Idaho);
