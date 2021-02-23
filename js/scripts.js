@@ -1,5 +1,23 @@
 "use strict";
+const states = async (state) => {
+  return await import("./states.js")
+  .finally((module) => module)
+  .then((obj) => obj.twoLetterStates)
+  .then((states) => states[state])
+    // .then((states) => {
+      //   return states.twoLetterStates.Indiana;
+      // });
+}
+console.log(states('Idaho'))
 
+// async function getStateAbbr(state) {
+//   const abbr = await states();
+//   return await abbr;
+// };
+
+
+// let ab = getStateAbbr('Idaho').then((response)=>response.Idaho);
+// console.log(ab)
 const employeesUrl = 'https://randomuser.me/api/?results=12&nat=us';
 const searchDiv = document.querySelector('.search-container');
 const galleryDiv = document.querySelector('#gallery');
