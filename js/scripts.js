@@ -1,5 +1,12 @@
 "use strict";
-
+/**========================================================================
+ * ?                                ABOUT
+ * @author         :  Leonard Bennett Crantford
+ * @email          :  lcranfrd@comcast.net
+ * @repo           :  https://github.com/lcranfrd/public_api_request-v1.git
+ * @createdOn      :  2/15/2021
+ * @description    :  TreeHouse FS Degree Project #5 'Api Request'
+ *========================================================================**/  
 const employeesUrl = 'https://randomuser.me/api/?results=12&nat=us';
 const searchDiv = document.querySelector('.search-container');
 const galleryDiv = document.querySelector('#gallery');
