@@ -1,4 +1,5 @@
 "use strict";
+
 /**========================================================================
  * ?                                ABOUT
  * @author         :  Leonard Bennett Crantford
@@ -307,7 +308,7 @@ function clearGalleryDivMakeLiveIds(data, filteredData) {
 function addSearch(data) {
   const searchHtml = `
   <form action="#" method="get">
-    <input type="search" id="search-input" class="search-input" placeholder="Search...">
+    <input type="search" id="search-input" class="search-input" autocomplete="off" placeholder="Search...">
     <input type="submit" value="&#x1F50D;" id="search-submit" class="search-submit">
   </form>
   `;
